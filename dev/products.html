@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pétale — product renders (dev)</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<style>
+  :root{
+    --air:#F4E8EE; --ink:#24121F; --ink2:#301A2C; --vtext:#4A2346; --violet:#7A4B78; --violet-hi:#9A6497;
+    --line:rgba(36,18,31,.16);
+    --serif:"Playfair Display",Georgia,serif; --sans:"Manrope",Helvetica,Arial,sans-serif;
+    --expo:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--air)}
+  body{background:var(--air);color:var(--ink2);font:500 1rem/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+  main{max-width:80rem;margin:0 auto;padding:4.5rem clamp(1.5rem,6vw,6.5rem) 6rem}
+  .eyebrow{font:700 .875rem/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--vtext)}
+  h1{font:500 clamp(2.3rem,4vw,3.6rem)/1.08 var(--serif);color:var(--ink);margin:.8rem 0 1rem}
+  h1 em{font-style:italic;font-weight:400}
+  .lede{max-width:40rem;color:var(--ink2)}
+  h2{font:500 1.6rem/1.2 var(--serif);color:var(--ink);margin:4.5rem 0 1.4rem}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(1rem,2vw,1.8rem);margin-top:3.2rem}
+  .pcard{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .pframe{width:100%;aspect-ratio:4/5;border-radius:20px;overflow:hidden;background:#F1E4EB}
+  .pframe img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .9s var(--expo)}
+  @media(hover:hover){.pcard:hover .pframe img{transform:scale(1.035)}}
+  .pinfo{margin-top:1.1rem}
+  .pinfo h3{font:500 1.45rem/1.15 var(--serif);color:var(--ink)}
+  .pnote{font-size:.95rem;color:var(--ink2);margin-top:.3rem}
+  .pprice{display:block;font-size:1.1rem;font-weight:700;color:var(--vtext);margin-top:.35rem}
+  .thumbs{display:flex;flex-wrap:wrap;gap:1.25rem}
+  .thumb{display:flex;gap:.9rem;align-items:center;padding:.8rem 1.1rem .8rem .8rem;border-radius:18px;
+    background:rgba(255,255,255,.55);border:1px solid var(--line)}
+  .thumb img{width:72px;height:84px;object-fit:cover;border-radius:12px;display:block;background:#F1E4EB}
+  .thumb b{display:block;font:500 1.05rem/1.2 var(--serif);color:var(--ink)}
+  .thumb span{font-size:.875rem;color:var(--ink2)}
+  .full{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+  .full figure{border-radius:20px;overflow:hidden;background:#F1E4EB}
+  .full img{width:100%;height:auto;display:block}
+  .full figcaption{padding:.7rem 1rem;font-size:.875rem;color:var(--ink2);background:rgba(255,255,255,.5)}
+  @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-aspect-ratio:85/100){main{padding:3rem 1.3rem 4rem}.grid{margin-top:2rem}.full{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Dev · Products</p>
+  <h1>The collection, <em>in the studio.</em></h1>
+  <p class="lede">Four hand-drawn SVG studio shots (928×1152, 4:5) that share one sweep, one key light from the upper left and one camera height. Shown here as the page’s 4:5 cards, as the bag’s 72×84 thumbnails and at full size.</p>
+
+  <div class="grid" id="grid"></div>
+
+  <h2>Bag thumbnails · 72×84, object-fit: cover</h2>
+  <div class="thumbs" id="thumbs"></div>
+
+  <h2>Full size</h2>
+  <div class="full" id="full"></div>
+</main>
+<script src="../assets/js/config.js"></script>
+<script>
+(function () {
+  var fallback = [
+    { sku: "cream", short: "Renewal Cream", note: "Peony · Hyaluronic acid", size: "50 ml", price: 124, img: "assets/img/products/cream.svg", alt: "" },
+    { sku: "serum", short: "Morning Serum", note: "Peony · Niacinamide", size: "30 ml", price: 92, img: "assets/img/products/serum.svg", alt: "" },
+    { sku: "eye", short: "Eye Balm", note: "Peony · Caffeine", size: "15 ml", price: 68, img: "assets/img/products/eye.svg", alt: "" },
+    { sku: "oil", short: "Night Oil", note: "Peony · Rosehip", size: "30 ml", price: 84, img: "assets/img/products/oil.svg", alt: "" }
+  ];
+  var site = window.SITE || {};
+  var list = (site.products && site.products.length) ? site.products : fallback;
+  var sym = (site.currency && site.currency.symbol) || "$";
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function img(p, lazy) {
+    var i = new Image(); i.src = "../" + p.img; i.alt = p.alt || p.short; i.width = 928; i.height = 1152;
+    i.decoding = "async"; if (lazy) i.loading = "lazy"; return i;
+  }
+  var grid = document.getElementById("grid"), thumbs = document.getElementById("thumbs"), full = document.getElementById("full");
+  list.forEach(function (p) {
+    var card = el("article", "pcard"), frame = el("div", "pframe");
+    frame.appendChild(img(p)); card.appendChild(frame);
+    card.appendChild(el("div", "pinfo", "<h3>" + esc(p.short) + "</h3><p class=\"pnote\">" + esc(p.note) + "</p><span class=\"pprice\">" + sym + p.price + "</span>"));
+    grid.appendChild(card);
+    var t = el("div", "thumb"); t.appendChild(img(p));
+    t.appendChild(el("div", "", "<b>" + esc(p.short) + "</b><span>" + esc(p.size || "") + " · " + sym + p.price + "</span>"));
+    thumbs.appendChild(t);
+    var f = el("figure"); f.appendChild(img(p, true)); f.appendChild(el("figcaption", "", esc(p.img)));
+    full.appendChild(f);
+  });
+})();
+</script>
+</body>
+</html>

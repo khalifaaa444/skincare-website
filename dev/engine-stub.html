@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="../">
+<title>Engine — player harness</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --air:#F4E8EE; --ink:#24121F; }
+  html, body { margin: 0; background: var(--air); color: var(--ink); font: 600 1rem/1.5 Helvetica, Arial, sans-serif; }
+  #film { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--air); }
+  main { position: relative; z-index: 2; }
+  section { position: relative; box-sizing: border-box; padding: 4.5rem; border-top: 2px dashed rgba(36,18,31,.25); }
+  section h2 { margin: 0; font-size: 2rem; }
+  section::after { content: attr(id) ' centre'; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid #c0306a;
+                   font-size: .875rem; color: #c0306a; padding: .2rem 4.5rem; }
+  #top { height: 100vh; } #bloom { height: 140vh; } #cream { height: 160vh; } #texture { height: 120vh; } #line { height: 130vh; }
+  #after { height: 150vh; }
+  #hud { position: fixed; right: 12px; bottom: 12px; z-index: 99; font: .875rem/1.45 ui-monospace, Menlo, monospace;
+         background: rgba(20,8,18,.82); color: #f7e9f0; padding: 10px 14px; border-radius: 10px; white-space: pre; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="film"></div>
+<main>
+  <section id="top"><h2>#top</h2></section>
+  <section id="bloom"><h2>#bloom</h2></section>
+  <section id="cream"><h2>#cream</h2></section>
+  <section id="texture"><h2>#texture</h2></section>
+  <section id="line"><h2>#line</h2></section>
+  <section id="after"><h2>after</h2></section>
+</main>
+<div id="hud">…</div>
+
+<script>
+/* A tiny inline film source that draws its progress and records every call the player makes.
+   Query: ?scene=NAME  ?source=auto|frames|scene  ?manifest=URL  ?nocontainer=1
+          ?fail3d=reject|throw  ?slow=MS  ?throw=1 (render throws)  ?inject=1 (data: script) */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var calls = window.__calls = { create: [], resize: [], load: [], render: 0, moving: [], destroy: [], last: null };
+
+  function stub(name, behaviour) {
+    return function create(opts) {
+      calls.create.push(name);
+      if (behaviour === 'throw-create') throw new Error(name + ' cannot start');
+      var c = document.createElement('canvas');
+      c.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
+      c.dataset.source = name;
+      opts.container.appendChild(c);
+      var x = c.getContext('2d'), size = { w: 1, h: 1, dpr: 1 }, lastMoving = null;
+      return {
+        load: function (onProgress, hint) {
+          calls.load.push({ name: name, hint: hint && hint.progress });
+          if (behaviour === 'reject') return Promise.reject(new Error(name + ' has no WebGL here'));
+          var ms = +q.get('slow') || 120;
+          return new Promise(function (resolve) {
+            var t0 = performance.now();
+            (function step() {
+              var f = Math.min(1, (performance.now() - t0) / ms);
+              onProgress(f);
+              if (f < 1) setTimeout(step, 20); else resolve();
+            })();
+          });
+        },
+        resize: function (v) {
+          calls.resize.push({ name: name, w: v.w, h: v.h, dpr: v.dpr, portrait: v.portrait, t: performance.now() });
+          size = v;
+          c.width = Math.round(v.w * v.dpr); c.height = Math.round(v.h * v.dpr);
+        },
+        render: function (p, info) {
+          if (behaviour === 'throw-render') throw new Error(name + ' render broke');
+          calls.render++;
+          calls.last = { p: p, moving: info.moving, velocity: info.velocity, t: performance.now() };
+          if (info.moving !== lastMoving) { calls.moving.push([performance.now(), info.moving, p]); lastMoving = info.moving; }
+          var w = c.width, h = c.height, d = size.dpr;
+          x.fillStyle = '#F4E8EE'; x.fillRect(0, 0, w, h);
+          x.fillStyle = info.moving ? '#E58BB0' : '#7A4B78';
+          x.fillRect(0, h - 24 * d, w * p, 24 * d);
+          for (var k = 0; k <= 4; k++) { x.fillStyle = '#24121F'; x.fillRect(w * k / 4 - d, h - 40 * d, 2 * d, 40 * d); }
+          x.fillStyle = '#24121F';
+          x.font = (size.portrait ? 64 : 120) * d + 'px Georgia, serif';
+          x.textAlign = 'right';
+          x.fillText(name + '  p ' + p.toFixed(3), w - 40 * d, h * 0.45);
+          x.font = 28 * d + 'px Helvetica, Arial, sans-serif';
+          x.fillText((size.portrait ? 'portrait ' : 'landscape ') + size.w + '×' + size.h + ' @' + size.dpr +
+                     (info.moving ? '  moving ' + info.velocity.toFixed(2) + '/s' : '  at rest'), w - 40 * d, h * 0.45 + 50 * d);
+        },
+        destroy: function () { calls.destroy.push(name); if (c.parentNode) c.parentNode.removeChild(c); }
+      };
+    };
+  }
+  var FS = window.FilmSources = window.FilmSources || {};
+  FS.stub = stub('stub', q.get('throw') ? 'throw-render' : '');
+  FS.scene2d = stub('scene2d', '');
+  if (q.get('fail3d')) FS.scene3d = stub('scene3d', q.get('fail3d') === 'throw' ? 'throw-create' : 'reject');
+})();
+</script>
+<script src="assets/js/film/player.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var log = window.__log = { progress: [], ready: 0, readyAt: 0 };
+  var t0 = performance.now();
+  var config = {
+    source: q.get('source') || 'scene',
+    manifest: q.get('manifest') || 'dev/engine-test/none.json',
+    scene: q.get('scene') || 'stub'
+  };
+  var scripts = null;
+  if (q.get('inject')) {
+    config.scene = 'injected';
+    scripts = { injected: 'data:text/javascript,' + encodeURIComponent(
+      'window.FilmSources.injected = window.FilmSources.stub;') };
+  }
+  var player = window.__player = FilmPlayer.create({
+    container: q.get('nocontainer') ? null : document.getElementById('film'),
+    anchors: ['top', 'bloom', 'cream', 'texture', 'line'],
+    config: config,
+    scripts: scripts,
+    onLoadProgress: function (f) { log.progress.push(f); },
+    onReady: function () { log.ready++; log.readyAt = performance.now() - t0; }
+  });
+  var lenis = q.get('lenis') === '1' && window.Lenis ? new Lenis() : null;
+  var hud = document.getElementById('hud'), hudT = 0;
+  window.__frames = [];
+  function loop(t) {
+    if (lenis) lenis.raf(t);
+    var p = player.frame(t, window.scrollY);
+    if (window.__recording) window.__frames.push([t, p, player.target]);
+    if (t - hudT > 100) {
+      hudT = t;
+      hud.textContent = 'source   ' + (window.__film.source || '…') + '\nprogress ' + player.progress.toFixed(4) +
+        '  target ' + player.target.toFixed(4) + '\nmoving   ' + player.moving + '  v ' + player.velocity.toFixed(3) +
+        '\nrenders  ' + window.__calls.render + '  resizes ' + window.__calls.resize.length + '\nLVH      ' + window.__film.lvh();
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

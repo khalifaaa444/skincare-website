@@ -1,0 +1,312 @@
+/* ═══ Pétale — page styles ═══════════════════════════════════════════════════════════
+   One page over a fixed scroll-scrubbed film (#film). The scenes are transparent so the
+   film shows through; glass lives only on the chrome (nav pill, bag, checkout).
+   Type floor: nothing under 0.875rem.                                                   */
+
+/* ── tokens (shared: checkout.css and the film sources read these names) ── */
+:root{
+  --air:#F4E8EE;            /* pearl-pink page / film air */
+  --ink:#24121F;
+  --ink2:#301A2C;
+  --vtext:#4A2346;          /* violet text */
+  --violet:#7A4B78;         /* fills only, never text */
+  --violet-hi:#9A6497;
+  --lilac:#C49BC1;
+  --line:rgba(36,18,31,.16);
+  --line-2:rgba(122,75,120,.5);
+  --serif:"Playfair Display",Georgia,serif;
+  --sans:"Manrope",Helvetica,Arial,sans-serif;
+  --expo:cubic-bezier(.16,1,.3,1);
+
+  /* page-only helpers */
+  --gutter:clamp(1.5rem,3.5vw,4.5rem);       /* scene column inset */
+  --edge:clamp(1.5rem,6vw,6.5rem);           /* collection / footer inset */
+  --fill:linear-gradient(135deg,var(--violet-hi) 0%,var(--violet) 62%,#5F3A5E 100%);
+  --fill-done:linear-gradient(135deg,#B587B2 0%,#8D5B8A 58%,#6B4369 100%);
+  --lift:inset 0 1px 0 rgba(255,255,255,.35),0 10px 28px -10px rgba(95,58,94,.7);
+  --lift-hi:inset 0 1px 0 rgba(255,255,255,.45),0 16px 36px -12px rgba(95,58,94,.8);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+
+/* ── base ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-behavior:auto;background:var(--air)}
+body{min-height:100vh;background:var(--air);color:var(--ink);font-family:var(--sans);font-weight:500;
+  font-size:1.125rem;line-height:1.65;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale}
+::selection{background:var(--violet);color:#fff}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+img,svg{display:block;max-width:100%}
+ol,ul{list-style:none}
+h1,h2,h3,h4{font-weight:inherit;font-size:inherit}
+:focus-visible{outline:2px solid var(--violet-hi);outline-offset:4px}
+[tabindex="-1"]:focus{outline:none}
+
+/* Lenis (smooth scroll) — the classes it toggles on <html> */
+html.lenis,html.lenis body{height:auto}
+.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+.lenis [data-lenis-prevent],.lenis [data-lenis-prevent-wheel],.lenis [data-lenis-prevent-touch]{overscroll-behavior:contain}
+.lenis.lenis-smooth iframe{pointer-events:none}
+
+/* ── skip link ── */
+.skip{position:fixed;left:1rem;top:calc(1rem + var(--safe-t));z-index:70;padding:.8rem 1.3rem;border-radius:100px;
+  background:var(--ink);color:#fff;font-size:.95rem;font-weight:700;letter-spacing:.02em;
+  transform:translateY(calc(-100% - 2rem - var(--safe-t)));transition:transform .35s var(--expo)}
+.skip:focus,.skip:focus-visible{transform:none}
+
+/* ── the film: fixed behind everything, sources append their own canvas ── */
+#film{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:0;pointer-events:none;overflow:hidden;
+  background:radial-gradient(120% 95% at 62% 46%,var(--air) 0%,#F2E3EB 62%,#EFDDE8 100%) var(--air);
+  contain:layout paint}
+
+/* ── loading veil ── */
+.veil{position:fixed;inset:0;z-index:60;display:grid;place-content:center;justify-items:center;gap:1.4rem;
+  background:var(--air);transition:opacity 1.1s var(--expo),visibility 1.1s;will-change:opacity}
+.veil.gone{opacity:0;visibility:hidden;pointer-events:none}
+.veil.out{display:none}
+.veil b{font-family:var(--serif);font-weight:500;font-size:1.7rem;line-height:1;letter-spacing:.42em;text-indent:.42em;color:var(--ink)}
+.veil .bar{width:min(190px,46vw);height:2px;background:var(--line);overflow:hidden}
+.veil .bar span{display:block;height:100%;background:var(--violet);transform:scaleX(0);transform-origin:0 50%;
+  transition:transform .4s var(--expo)}
+.veil small{font-size:.875rem;font-weight:600;line-height:1;letter-spacing:.24em;text-indent:.24em;text-transform:uppercase;color:var(--ink2)}
+/* if site.js never boots, the inline head script drops back to .nojs; this is the CSS-only net */
+.js .veil{animation:veil-net .6s ease 10s forwards}
+@keyframes veil-net{to{opacity:0;visibility:hidden}}
+
+/* ── film progress (written by site.js as transform:scaleX) ── */
+.prog{position:fixed;top:0;left:0;width:100%;height:2px;z-index:50;pointer-events:none;
+  transform:scaleX(0);transform-origin:0 50%;background:linear-gradient(90deg,var(--lilac),var(--violet))}
+
+/* ── nav: a centred glass pill (chrome only) ── */
+.nav{position:fixed;top:calc(1.1rem + var(--safe-t));left:50%;transform:translateX(-50%);z-index:46;max-width:calc(100vw - 1.6rem)}
+.pill{display:flex;align-items:center;gap:clamp(.9rem,2vw,1.6rem);padding:.5rem .5rem .5rem 1.5rem;border-radius:100px;
+  background:rgba(246,245,250,.6);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid rgba(255,255,255,.75);box-shadow:0 12px 32px -22px rgba(74,35,70,.45)}
+.pill .brand{font-family:var(--serif);font-weight:600;font-size:1.2rem;line-height:1;letter-spacing:.28em;color:var(--ink);
+  white-space:nowrap;padding:.35rem 0}
+.pill .link{position:relative;font-size:.95rem;font-weight:700;letter-spacing:.04em;line-height:1.4;color:var(--ink);white-space:nowrap;
+  transition:color .3s}
+.pill .link::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:2px;border-radius:2px;background:var(--violet);
+  transform:scaleX(0);transform-origin:100% 50%;transition:transform .5s var(--expo)}
+.pill .link:hover{color:var(--vtext)}
+.pill .link:hover::after{transform:scaleX(1);transform-origin:0 50%}
+.pill [data-cart-button]:empty{display:block;flex:none;width:42px;height:42px}   /* holds the bag button's place */
+@media (max-width:760px){
+  .pill .link{display:none}
+  .pill{padding:.42rem .42rem .42rem 1.15rem;gap:1rem}
+  .pill .brand{font-size:1.1rem}
+}
+@media (max-width:359px){
+  .pill{gap:.7rem;padding-left:1rem}
+  .pill .brand{letter-spacing:.2em}
+}
+@media (pointer:coarse){
+  .pill{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(246,245,250,.92)}
+}
+
+/* ── buttons: the violet pill with its own soft light. The halo breathes on opacity only. ── */
+.btn,.pbook,.add{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:100px;font-family:var(--sans);font-weight:600;line-height:1;color:#fff;letter-spacing:.04em;white-space:nowrap;
+  background:var(--fill);box-shadow:var(--lift);transition:transform .25s var(--expo),box-shadow .35s;user-select:none;-webkit-user-select:none}
+.btn{min-height:56px;padding:0 2rem;font-size:.95rem}
+.pbook{min-height:42px;padding:0 1.25rem;font-size:.875rem}
+.btn::before,.pbook::before,.add::before{content:"";position:absolute;inset:-7px;border-radius:inherit;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(226,160,205,.6),rgba(226,160,205,0));filter:blur(10px);opacity:.55}
+.btn::before,.pbook::before{animation:halo 3.6s ease-in-out infinite}
+.add::before{opacity:0;transition:opacity .4s}
+.btn:hover,.pbook:hover,.add:hover{transform:translateY(-1px);box-shadow:var(--lift-hi)}
+.btn:hover::before,.pbook:hover::before,.add:hover::before{opacity:1;animation:none}
+.btn:active,.pbook:active,.add:active{transform:translateY(0) scale(.985)}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn[disabled]::before{display:none}
+@keyframes halo{0%,100%{opacity:.4}50%{opacity:.85}}
+
+/* product-card "Add to bag" */
+.add{gap:.55rem;min-height:46px;padding:0 1.4rem;font-size:.875rem;font-weight:700}
+.add .ic{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.add .ic-ok{display:none}
+/* .is-added — CHECKOUT toggles it for ~1.6 s after a click */
+.btn.is-added,.pbook.is-added,.add.is-added{background:var(--fill-done);animation:added .55s var(--expo)}
+.btn.is-added::before,.add.is-added::before{opacity:1;animation:none}
+.add.is-added .ic-bag{display:none}
+.add.is-added .ic-ok{display:block;stroke-dasharray:22;stroke-dashoffset:0;animation:tick .5s var(--expo) .05s backwards}
+/* if a label swap ever strips the inline icons, draw them from CSS instead */
+.add:not(:has(.ic))::after{content:"";order:-1;flex:none;width:16px;height:16px;background:currentColor;
+  -webkit-mask:var(--i-bag) center/contain no-repeat;mask:var(--i-bag) center/contain no-repeat}
+.add.is-added:not(:has(.ic))::after{-webkit-mask-image:var(--i-ok);mask-image:var(--i-ok)}
+.add{--i-bag:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z'/%3E%3Cpath d='M9 8.5V7a3 3 0 0 1 6 0v1.5'/%3E%3C/svg%3E");
+  --i-ok:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5.5 12.5 4.2 4.2 8.8-9.2'/%3E%3C/svg%3E")}
+@keyframes added{0%{transform:scale(.95)}100%{transform:none}}
+@keyframes tick{from{stroke-dashoffset:22}to{stroke-dashoffset:0}}
+
+.tlink{font-size:1rem;font-weight:700;line-height:1.4;color:var(--vtext);padding-bottom:3px;border-bottom:2px solid rgba(122,75,120,.35);
+  transition:border-color .35s}
+.tlink:hover{border-color:var(--violet)}
+
+/* ── reveals (JS only — without JS everything is simply there) ── */
+.ln{display:block;overflow:hidden;padding:0 .06em .14em;margin:0 -.06em -.06em}
+.ln>i{display:block;font-style:inherit}
+.js .ln>i{transform:translateY(115%);transition:transform 1.2s var(--expo) var(--d,0s)}
+.js .rise{opacity:0;transform:translateY(16px);transition:opacity 1.1s ease var(--d,.05s),transform 1.2s var(--expo) var(--d,.05s)}
+.js .in .ln>i,.ready .hero .ln>i{transform:none}
+.js .in .rise,.ready .hero .rise{opacity:1;transform:none}
+.js .hint{opacity:0;transition:opacity 1s var(--expo) var(--d,.7s)}
+.ready .hint{opacity:1}
+.ready.scrolled .hint{opacity:0;transition:opacity .5s ease}
+
+/* ── type ── */
+.eyebrow{font-size:.875rem;font-weight:700;line-height:1.5;letter-spacing:.2em;text-transform:uppercase;color:var(--vtext)}
+.display{font-family:var(--serif);font-weight:500;line-height:1.04;letter-spacing:-.01em;color:var(--ink)}
+.display em{font-style:italic;font-weight:400}
+.body{color:var(--ink2);font-size:1.12rem;font-weight:600;max-width:28em;text-wrap:pretty}
+
+/* ── scenes: transparent, the film shows through. Desktop: a left column in the clean air
+   to the left of the subject (the film keeps x < ~0.32·w empty). ── */
+.scene{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;
+  padding:6.5rem var(--gutter) 3rem}
+.col{width:clamp(17rem,21vw,25rem)}
+.rule{width:56px;height:2px;background:var(--line-2);margin-bottom:1.4rem}
+.scene .eyebrow{margin-bottom:1rem}
+.scene .display{font-size:clamp(2.2rem,3.1vw,3.4rem);margin-bottom:1.1rem}
+
+.hero .eyebrow{margin-bottom:1.3rem}
+.hero .title{font-size:clamp(2.6rem,3.9vw,4.4rem);margin-bottom:1.3rem}
+.hero .sub{font-size:1.14rem;font-weight:600;color:var(--ink);max-width:25em;text-wrap:pretty}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.6rem;margin-top:2.2rem}
+
+.scroll-hint{position:absolute;left:var(--gutter);bottom:clamp(1.6rem,5vh,2.6rem);display:flex;align-items:center;gap:.8rem;
+  font-size:.875rem;font-weight:700;line-height:1;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2)}
+.scroll-hint i{display:block;width:2px;height:34px;border-radius:2px;background:linear-gradient(var(--violet),rgba(122,75,120,0));
+  animation:drop 2.2s var(--expo) infinite}
+@keyframes drop{
+  0%{transform:scaleY(0);transform-origin:50% 0}
+  55%{transform:scaleY(1);transform-origin:50% 0}
+  56%{transform:scaleY(1);transform-origin:50% 100%}
+  100%{transform:scaleY(0);transform-origin:50% 100%}
+}
+
+/* the cream's three promises */
+.tlist{border-top:1px solid var(--line);margin-top:.4rem}
+.trow{display:grid;grid-template-columns:2.4rem 1fr;gap:.25rem 1rem;padding:1.05rem 0;border-bottom:1px solid var(--line)}
+.trow .num{font-family:var(--serif);font-style:italic;font-size:1.2rem;line-height:1.55;color:var(--vtext)}
+.trow h3{font-family:var(--serif);font-weight:500;font-size:1.4rem;line-height:1.2;color:var(--ink)}
+.trow p{grid-column:2;font-size:1.05rem;font-weight:600;line-height:1.45;color:var(--ink);text-wrap:pretty}
+
+/* ── the collection: its own field of pearl air (the film has ended above it) ── */
+.collection{position:relative;z-index:2;padding:9rem var(--edge) 5rem;
+  background:linear-gradient(to bottom,rgba(244,232,238,0),rgba(244,232,238,.94) 12%,var(--air) 22%)}
+.chead{max-width:46rem;margin:0 auto 3.2rem;text-align:center}
+.chead .display{font-size:clamp(2.6rem,4vw,4rem);margin:.8rem 0 1rem;text-wrap:balance}
+.chead .body{margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(1rem,2vw,1.8rem);max-width:80rem;margin:0 auto}
+.pcard{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.pframe{width:100%;aspect-ratio:4/5;border-radius:20px;overflow:hidden;background:#F1E4EB;
+  box-shadow:inset 0 0 0 1px rgba(122,75,120,.06)}
+.pframe img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--expo)}
+@media (hover:hover){.pcard:hover .pframe img{transform:scale(1.035)}}
+.pinfo{margin:1.1rem 0 1.1rem}
+.pinfo h3{font-family:var(--serif);font-weight:500;font-size:1.45rem;line-height:1.15;color:var(--ink)}
+.pnote{font-size:.95rem;line-height:1.5;color:var(--ink2);margin-top:.3rem}
+.pprice{font-size:1.1rem;font-weight:700;line-height:1.4;color:var(--vtext);margin-top:.35rem}
+.pcard .add{margin-top:auto}
+.js .pcard{opacity:0;transform:translateY(22px);transition:opacity 1s ease var(--d,.06s),transform 1.2s var(--expo) var(--d,.06s)}
+.js .pcard.in{opacity:1;transform:none}
+.pcard:nth-child(1){--d:.06s}.pcard:nth-child(2){--d:.12s}.pcard:nth-child(3){--d:.18s}.pcard:nth-child(4){--d:.24s}
+@media (max-width:980px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pcard:nth-child(odd){--d:.06s}.pcard:nth-child(even){--d:.14s}
+}
+@media (max-width:359px){
+  .add{padding:0 .95rem;gap:.4rem}
+  .add .ic{width:14px;height:14px}
+}
+
+/* ── footer: rises out of the film's last frame ── */
+.foot{position:relative;z-index:2;min-height:92vh;min-height:92svh;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 var(--edge) calc(clamp(1.8rem,4vh,2.6rem) + var(--safe-b));
+  background:linear-gradient(to bottom,var(--air) 0%,rgba(244,232,238,0) 13%,rgba(244,232,238,0) 18%,rgba(244,232,238,.9) 38%,var(--air) 58%)}
+.foot-in{width:100%;max-width:76rem;margin:0 auto}
+.fmain{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:clamp(2rem,5vw,4rem);padding-bottom:2.4rem;border-bottom:1px solid var(--line)}
+.flogo{font-family:var(--serif);font-weight:600;font-size:1.8rem;line-height:1.2;letter-spacing:.3em;color:var(--ink);margin-bottom:1.2rem}
+.ftag{color:var(--ink2);font-size:1.02rem;line-height:1.7;max-width:26em;text-wrap:pretty}
+.fcol h2{font-size:.875rem;font-weight:700;line-height:1.5;letter-spacing:.16em;text-transform:uppercase;color:var(--vtext);margin-bottom:1.1rem}
+.fcol a{display:block;width:fit-content;font-size:1.02rem;font-weight:500;line-height:1.65;color:var(--ink);padding:.3rem 0;
+  text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px;text-decoration-color:transparent;
+  transition:color .3s,text-decoration-color .3s}
+.fcol a:hover{color:var(--vtext);text-decoration-color:var(--line-2)}
+.fcol p{font-size:1rem;line-height:1.7;color:var(--ink2);margin-bottom:.8rem}
+.fbar{display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;align-items:center;padding-top:1.5rem}
+.fbar p,.flegal a{font-size:.875rem;font-weight:600;line-height:1.5;color:var(--ink2)}
+.flegal{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem}
+.flegal a{transition:color .3s}
+.flegal a:hover{color:var(--ink)}
+@media (max-width:820px){
+  .fmain{grid-template-columns:1fr 1fr;gap:2rem 1.5rem}
+  .fmain>.fbrand{grid-column:1/-1}
+}
+
+/* ── short landscape screens (laptops at 768 px and less): a tighter vertical rhythm ── */
+@media (max-height:820px){
+  .scene{padding-top:5.6rem;padding-bottom:2.2rem}
+  .scene .display{margin-bottom:.9rem}
+  .hero .title{margin-bottom:1.1rem}
+  .trow{padding:.8rem 0}
+  .trow h3{font-size:1.28rem}
+  .trow p{font-size:1rem}
+  .actions{margin-top:1.8rem}
+}
+
+/* ── phones (and portrait tablets): the film keeps its subject in the LOWER ~60% of a tall
+   frame, so every block sits in the clean air at the TOP. ── */
+@media (max-aspect-ratio:85/100){
+  .scene{align-items:flex-start;padding:calc(5.4rem + var(--safe-t)) 1.3rem 2rem}
+  .col{width:100%;max-width:30rem}
+  .rule,.hero .eyebrow,.scroll-hint{display:none}
+  .scene .eyebrow{margin-bottom:.4rem}
+  .hero .title{font-size:clamp(2.2rem,9.6vw,2.7rem);margin-bottom:.55rem}
+  .scene .display{font-size:clamp(1.95rem,8.4vw,2.4rem);margin-bottom:.5rem}
+  .body{font-size:1.06rem;line-height:1.5;color:var(--ink)}
+  .actions{margin-top:.9rem;gap:1.1rem}
+  .btn{min-height:50px;padding:0 1.5rem;font-size:.92rem}
+  .tlist{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem;border-top:0;margin-top:.2rem}
+  .trow{display:block;padding:.5rem 0}
+  .trow .num,.trow p{display:none}
+  .trow h3{font-size:1.06rem;line-height:1.2}
+  /* the product climbs into the upper half in these beats: headline only */
+  .hero .sub,#texture .body,#line .body{display:none}
+
+  .collection{padding:6rem 1.3rem 4rem}
+  .chead{margin-bottom:2rem;text-align:left}
+  .chead .display{font-size:2.3rem}
+  .chead .body{margin:0}
+  .foot{padding-left:1.3rem;padding-right:1.3rem}
+}
+/* portrait tablets: same composition, a little more room */
+@media (max-aspect-ratio:85/100) and (min-width:600px){
+  .scene{padding-left:2.6rem;padding-right:2.6rem;padding-top:calc(6.2rem + var(--safe-t))}
+  .col{max-width:34rem}
+  .hero .title{font-size:3.3rem}
+  .scene .display{font-size:2.9rem}
+  .trow h3{font-size:1.2rem}
+  .collection{padding-left:2.6rem;padding-right:2.6rem}
+  .chead .display{font-size:3rem}
+  .foot{padding-left:2.6rem;padding-right:2.6rem}
+}
+
+/* ── no JS: content is simply there, no veil, no film progress ── */
+.nojs .veil,.nojs .prog{display:none}
+
+/* ── reduced motion: nothing moves, everything is visible ── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;
+    transition-duration:.01ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+  .js .veil{animation-delay:10s!important}            /* the CSS safety net keeps its timing */
+  .js .ln>i,.js .rise,.js .pcard{transform:none;opacity:1}
+  .btn::before,.pbook::before{animation:none}
+  .btn:hover,.pbook:hover,.add:hover,.btn:active,.pbook:active,.add:active{transform:none}
+  .is-added{animation:none!important}
+  .scroll-hint i{animation:none;transform:none}
+  @media (hover:hover){.pcard:hover .pframe img{transform:none}}
+}

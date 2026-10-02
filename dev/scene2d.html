@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<base href="../">
+<title>Scene 2D — film harness</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --air:#F4E8EE; --ink:#24121F; --violet:#7A4B78; }
+  html, body { margin: 0; height: 100%; background: var(--air); color: var(--ink); overflow: hidden;
+               font: 600 0.875rem/1.4 Helvetica, Arial, sans-serif; }
+  #film { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--air); }
+  .bar { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 5; display: flex; gap: 12px; align-items: center;
+         padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,.62); -webkit-backdrop-filter: blur(10px);
+         backdrop-filter: blur(10px); box-shadow: 0 6px 24px -12px rgba(36,18,31,.4); }
+  .bar input[type=range] { flex: 1; accent-color: var(--violet); }
+  .bar button { font: inherit; border: 0; border-radius: 99px; padding: 6px 14px; background: var(--violet); color: #fff; cursor: pointer; }
+  .bar output { min-width: 4.6em; font-variant-numeric: tabular-nums; }
+  #hud { position: fixed; right: 12px; top: 12px; z-index: 6; white-space: pre; pointer-events: none;
+         font: 0.875rem/1.45 ui-monospace, Menlo, monospace; background: rgba(20,8,18,.8); color: #f7e9f0;
+         padding: 8px 12px; border-radius: 10px; }
+  .noui .bar, .nohud #hud { display: none; }
+</style>
+</head>
+<body>
+<div id="film"></div>
+<div class="bar">
+  <button id="play" type="button">Animate</button>
+  <input id="p" type="range" min="0" max="1" step="0.001" value="0" aria-label="Film progress">
+  <output id="pv">0.000</output>
+</div>
+<div id="hud">…</div>
+<script src="assets/js/film/scene-2d.js"></script>
+<script>
+/* Query: ?p=0.5  ?animate=1 (sweep 0→1→0)  ?hud=1 (ms/frame readout)  ?ui=0 (no controls, for screenshots)
+          ?period=8 (seconds per sweep) */
+(function () {
+  var q = new URLSearchParams(location.search);
+  var root = document.documentElement;
+  if (q.get('ui') === '0') root.classList.add('noui');
+  if (!q.get('hud')) root.classList.add('nohud');
+  var film = document.getElementById('film'), slider = document.getElementById('p'), out = document.getElementById('pv');
+  var hud = document.getElementById('hud'), playBtn = document.getElementById('play');
+  var src = window.FilmSources.scene2d({ container: film });
+  var p = clamp(parseFloat(q.get('p')) || 0, 0, 1), ready = false, animating = q.get('animate') === '1';
+  var period = (parseFloat(q.get('period')) || 8) * 1000;
+  var times = [], last = 0, frames = 0;
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function viewport() {
+    var w = window.innerWidth, h = window.innerHeight;
+    return { w: w, h: h, dpr: Math.min(2, window.devicePixelRatio || 1), portrait: w / h < 0.85 };
+  }
+  function draw() {
+    var t0 = performance.now();
+    src.render(p, { moving: animating, velocity: 0 });
+    var dt = performance.now() - t0;
+    times.push(dt); if (times.length > 60) times.shift();
+    last = dt; frames++;
+    out.value = p.toFixed(3);
+    if (!root.classList.contains('nohud')) {
+      var avg = times.reduce(function (a, b) { return a + b; }, 0) / times.length;
+      var mx = Math.max.apply(null, times), d = src.debug ? src.debug() : {};
+      hud.textContent = 'p        ' + p.toFixed(3) + '\nrender   ' + last.toFixed(2) + ' ms\navg/60   ' + avg.toFixed(2) +
+        ' ms  max ' + mx.toFixed(2) + '\nbacking  ' + (d.backing || []).join('×') + '\ndraws    ' + d.draws +
+        '\nbake     ' + (d.bakeMs || 0).toFixed(0) + ' ms  filter ' + d.filter + '  sprite ' + d.sprite;
+    }
+  }
+  src.resize(viewport());
+  var resizeT = 0;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(function () { src.resize(viewport()); if (ready) draw(); }, 60);
+  });
+  slider.value = p;
+  slider.addEventListener('input', function () { animating = false; playBtn.textContent = 'Animate'; p = +slider.value; if (ready) draw(); });
+  playBtn.addEventListener('click', function () { animating = !animating; playBtn.textContent = animating ? 'Stop' : 'Animate'; if (animating) start = performance.now() - p * period; });
+  var start = performance.now() - p * period;
+  function loop(t) {
+    if (ready && animating) {
+      var u = ((t - start) % (2 * period)) / period;
+      p = u <= 1 ? u : 2 - u;
+      slider.value = p;
+      draw();
+    }
+    requestAnimationFrame(loop);
+  }
+  var t0 = performance.now();
+  window.__s2d = {
+    source: src,
+    ready: src.load(function (f) { hud.textContent = 'loading ' + Math.round(f * 100) + '%'; }).then(function () {
+      ready = true;
+      window.__s2d.loadMs = performance.now() - t0;
+      draw();
+    }),
+    set: function (v) { p = clamp(+v, 0, 1); slider.value = p; draw(); return src.debug ? src.debug() : null; },
+    times: function () { return times.slice(); },
+    resize: function (v) { src.resize(v || viewport()); draw(); }
+  };
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- the dev page behaves as if it sat at the site root, so SITE.products[].img and the asset paths resolve -->
+<base href="../">
+<title>Pétale — bag &amp; checkout (dev)</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Manrope:wght@500;600;700&amp;display=swap">
+<style>
+  /* tokens, as in the contract */
+  :root{
+    --air:#F4E8EE; --ink:#24121F; --ink2:#301A2C; --vtext:#4A2346;
+    --violet:#7A4B78; --violet-hi:#9A6497; --lilac:#C49BC1;
+    --line:rgba(36,18,31,.16); --line-2:rgba(122,75,120,.5);
+    --serif:"Playfair Display",Georgia,serif; --sans:"Manrope",Helvetica,Arial,sans-serif;
+    --expo:cubic-bezier(.16,1,.3,1);
+    --fill:linear-gradient(135deg,var(--violet-hi) 0%,var(--violet) 62%,#5F3A5E 100%);
+    --fill-done:linear-gradient(135deg,#B587B2 0%,#8D5B8A 58%,#6B4369 100%);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--air)}
+  body{min-height:100vh;color:var(--ink);font:500 1.0625rem/1.6 var(--sans);-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(60% 50% at 78% 22%,rgba(239,169,196,.55),rgba(239,169,196,0) 70%),
+      radial-gradient(50% 45% at 18% 78%,rgba(205,178,224,.45),rgba(205,178,224,0) 70%),
+      linear-gradient(180deg,#F4E8EE,#EFDDE8) fixed}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  img{display:block;max-width:100%}
+  :focus-visible{outline:2px solid var(--violet-hi);outline-offset:4px}
+  html.lenis,html.lenis body{height:auto}
+  .lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+  .lenis [data-lenis-prevent]{overscroll-behavior:contain}
+
+  .nav{position:fixed;top:1.1rem;left:50%;transform:translateX(-50%);z-index:46;max-width:calc(100vw - 1.6rem)}
+  .pill{display:flex;align-items:center;gap:clamp(.9rem,2vw,1.6rem);padding:.5rem .5rem .5rem 1.5rem;border-radius:100px;
+    background:rgba(246,245,250,.6);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);
+    border:1px solid rgba(255,255,255,.75);box-shadow:0 12px 32px -22px rgba(74,35,70,.45)}
+  .brand{font:600 1.2rem/1 var(--serif);letter-spacing:.28em;color:var(--ink);text-decoration:none;white-space:nowrap}
+  .link{font-size:.95rem;font-weight:700;letter-spacing:.04em;color:var(--ink);text-decoration:none;white-space:nowrap}
+  .pill [data-cart-button]:empty{display:block;width:42px;height:42px}
+  .pbook,.btn,.add{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;border-radius:100px;color:#fff;font-weight:700;
+    letter-spacing:.04em;white-space:nowrap;background:var(--fill);text-decoration:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 28px -10px rgba(95,58,94,.7);transition:transform .25s var(--expo)}
+  .pbook{min-height:42px;padding:0 1.25rem;font-size:.875rem}
+  .btn{min-height:56px;padding:0 2rem;font-size:.95rem}
+  .add{min-height:46px;padding:0 1.4rem;font-size:.875rem}
+  .add svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .add .ic-ok{display:none}
+  .is-added{background:var(--fill-done)!important}
+  .add.is-added .ic-bag{display:none}
+  .add.is-added .ic-ok{display:block}
+  .plain{margin-top:1rem;font-size:.95rem;font-weight:700;color:var(--vtext);text-decoration:underline;text-underline-offset:4px}
+  @media (max-width:760px){.pill .link{display:none}.pill{padding:.42rem .42rem .42rem 1.15rem;gap:1rem}.brand{font-size:1.1rem}}
+
+  main{max-width:80rem;margin:0 auto;padding:8.5rem clamp(1.25rem,6vw,6.5rem) 6rem}
+  .eyebrow{font-size:.875rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--vtext)}
+  h1{font:500 clamp(2.4rem,5vw,4.2rem)/1.05 var(--serif);margin:.8rem 0 1.2rem}
+  h1 em{font-style:italic;font-weight:400}
+  .lede{max-width:36rem;color:var(--ink2);margin-bottom:2rem}
+  .actions{display:flex;flex-wrap:wrap;align-items:center;gap:1.2rem}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(1rem,2vw,1.8rem);margin-top:5rem}
+  .pcard{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .pframe{width:100%;aspect-ratio:4/5;border-radius:20px;overflow:hidden;background:#F1E4EB}
+  .pframe img{width:100%;height:100%;object-fit:cover}
+  .pcard h3{font:500 1.4rem/1.2 var(--serif);margin-top:1rem}
+  .pcard p{font-size:.95rem;color:var(--ink2)}
+  .pcard .price{font-weight:700;color:var(--vtext);margin:.2rem 0 1rem}
+  .notes{margin-top:5rem;max-width:44rem;color:var(--ink2)}
+  .notes h2{font:500 1.6rem/1.2 var(--serif);color:var(--ink);margin-bottom:.6rem}
+  .notes li{margin:.3rem 0 .3rem 1.2rem}
+  .log{margin-top:2rem;padding:1rem 1.2rem;border-radius:16px;background:rgba(255,255,255,.5);font:600 .9rem/1.5 ui-monospace,Menlo,monospace;color:var(--ink2)}
+  .spacer{height:90vh}
+  @media (max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<link rel="stylesheet" href="assets/css/checkout.css">
+</head>
+<body>
+<header class="nav">
+  <nav class="pill" aria-label="Main">
+    <a class="brand" href="dev/checkout.html#top">PÉTALE</a>
+    <a class="link" href="dev/checkout.html#grid">The collection</a>
+    <span data-cart-button></span>
+    <a class="pbook" href="dev/checkout.html#grid">Shop</a>
+  </nav>
+</header>
+
+<main id="top">
+  <p class="eyebrow">Dev · Bag &amp; checkout</p>
+  <h1>Try the bag, <em>then pay nothing.</em></h1>
+  <p class="lede">Every <code>[data-add-to-bag]</code> below adds one. The bag persists across reloads; the checkout is a demo that never charges a card or sends anything.</p>
+  <div class="actions">
+    <button class="btn" type="button" data-add-to-bag="cream"><span class="btn-label">Add to bag · <span data-price="cream">$124</span></span></button>
+    <button class="plain" type="button" data-add-to-bag="eye">Add the Eye Balm</button>
+  </div>
+
+  <ul class="grid" id="grid" role="list"></ul>
+
+  <section class="notes">
+    <h2>Console</h2>
+    <p>window.Cart: add, remove, setQty, open, close, checkout, items, clear. Test cards: 4242 4242 4242 4242 · 12/34 · 123, Amex 3782 822463 10005 · 4 digits.</p>
+    <div class="log" id="log">cart:change —</div>
+  </section>
+  <div class="spacer"></div>
+</main>
+
+<script src="assets/js/config.js"></script>
+<script>
+  /* product cards from SITE, built like the page builds them */
+  (function () {
+    var bag = '<svg class="ic-bag" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>';
+    var ok = '<svg class="ic-ok" viewBox="0 0 24 24" aria-hidden="true"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></svg>';
+    document.getElementById('grid').innerHTML = SITE.products.map(function (p) {
+      return '<li class="pcard"><div class="pframe"><img src="' + p.img + '" alt="' + p.alt + '" width="800" height="1000"></div>' +
+        '<h3>' + p.short + '</h3><p>' + p.note + '</p><p class="price">$' + p.price + '</p>' +
+        '<button class="add" type="button" data-add-to-bag="' + p.sku + '">' + bag + ok + '<span class="add-label">Add to bag</span></button></li>';
+    }).join('');
+  })();
+</script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script>
+  /* a Lenis instance like the page's, so stop()/start() are exercised */
+  (function () {
+    if (!window.Lenis || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var lenis = new Lenis({ lerp: 0.12, smoothWheel: true });
+    window.lenis = lenis;
+    (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(0);
+  })();
+  document.addEventListener('cart:change', function (e) {
+    window.__cartEvents = (window.__cartEvents || []).concat([e.detail]);
+    document.getElementById('log').textContent = 'cart:change — count ' + e.detail.count + ', subtotal ' + e.detail.subtotal;
+  });
+</script>
+<script src="assets/js/checkout.js" defer></script>
+</body>
+</html>

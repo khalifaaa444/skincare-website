@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" class="nojs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pétale — Peony Skincare</title>
+<meta name="description" content="A peony cream with hyaluronic acid, poured in small batches into a crystal jar made to be refilled.">
+<meta name="theme-color" content="#F4E8EE">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pétale">
+<meta property="og:title" content="Pétale — Peony Skincare">
+<meta property="og:description" content="A peony cream with hyaluronic acid, poured in small batches into a crystal jar made to be refilled.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<script>
+  /* flip to the JS layout before first paint (no flash of un-veiled content);
+     site.js confirms it. If site.js never boots, fall back to the no-JS layout. */
+  (function (h) {
+    h.className = h.className.replace(/\bnojs\b/, 'js');
+    setTimeout(function () { if (!h.hasAttribute('data-booted')) h.className = h.className.replace(/\bjs\b/, 'nojs'); }, 9000);
+  })(document.documentElement);
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- web fonts never block the first paint: loaded as a print sheet, switched on when it arrives -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Manrope:wght@500;600;700&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Manrope:wght@500;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/checkout.css">
+</head>
+<body>
+<a class="skip" href="#collection">Skip to the collection</a>
+
+<div id="film" aria-hidden="true"></div>
+<div class="prog" aria-hidden="true"></div>
+
+<div class="veil" id="veil" aria-hidden="true">
+  <b>PÉTALE</b>
+  <div class="bar"><span></span></div>
+  <small>Peony skincare</small>
+</div>
+
+<header class="nav">
+  <nav class="pill" aria-label="Main">
+    <a class="brand" href="#top" aria-label="Pétale, back to the top">PÉTALE</a>
+    <a class="link" href="#bloom">The flower</a>
+    <a class="link" href="#cream">The cream</a>
+    <a class="link" href="#collection">The collection</a>
+    <span data-cart-button></span>
+    <a class="pbook" href="#collection">Shop</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="scene hero" id="top" aria-labelledby="top-title">
+    <div class="col">
+      <p class="eyebrow rise" style="--d:.1s">Peony skincare · Small batches</p>
+      <h1 class="display title" id="top-title">
+        <span class="ln"><i style="--d:.15s">Skin in</i></span>
+        <span class="ln"><i style="--d:.26s"><em>full bloom.</em></i></span>
+      </h1>
+      <p class="sub rise" style="--d:.5s">A daily cream of peony extract and hyaluronic acid, poured into a crystal jar that's made to be refilled.</p>
+      <div class="actions rise" style="--d:.62s">
+        <button class="btn" type="button" data-add-to-bag="cream"><span class="btn-label">Add to bag · <span data-price="cream">$124</span></span></button>
+        <a class="tlink" href="#collection">Explore the collection</a>
+      </div>
+    </div>
+    <div class="scroll-hint hint" aria-hidden="true">Scroll <i></i></div>
+  </section>
+
+  <section class="scene" id="bloom" aria-labelledby="bloom-title">
+    <div class="col">
+      <div class="rule" aria-hidden="true"></div>
+      <p class="eyebrow"><span class="ln"><i>The flower</i></span></p>
+      <h2 class="display" id="bloom-title">
+        <span class="ln"><i>Gathered at sunrise,</i></span>
+        <span class="ln"><i style="--d:.1s"><em>petals still cool.</em></i></span>
+      </h2>
+      <p class="body rise" style="--d:.2s">Our peonies are cut in the first hours of light, when every petal is full of water, and pressed before noon. The extract goes straight into the cream.</p>
+    </div>
+  </section>
+
+  <section class="scene" id="cream" aria-labelledby="cream-title">
+    <div class="col">
+      <div class="rule" aria-hidden="true"></div>
+      <p class="eyebrow"><span class="ln"><i>The cream</i></span></p>
+      <h2 class="display" id="cream-title"><span class="ln"><i>One cream, <em>three promises.</em></i></span></h2>
+      <ol class="tlist">
+        <li class="trow rise" style="--d:.08s"><span class="num" aria-hidden="true">i</span><h3>Deep, lasting moisture</h3><p>Hyaluronic acid draws water in and holds it there all day.</p></li>
+        <li class="trow rise" style="--d:.16s"><span class="num" aria-hidden="true">ii</span><h3>A smoother surface</h3><p>Fine lines look softer after a month of morning and night use.</p></li>
+        <li class="trow rise" style="--d:.24s"><span class="num" aria-hidden="true">iii</span><h3>Calmer, even skin</h3><p>Peony extract quiets redness and evens out tone.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="scene" id="texture" aria-labelledby="texture-title">
+    <div class="col">
+      <div class="rule" aria-hidden="true"></div>
+      <p class="eyebrow"><span class="ln"><i>The texture</i></span></p>
+      <h2 class="display" id="texture-title">
+        <span class="ln"><i>Cloud-light,</i></span>
+        <span class="ln"><i style="--d:.1s"><em>then gone.</em></i></span>
+      </h2>
+      <p class="body rise" style="--d:.2s">It lifts from the jar like whipped cream and melts into warm skin in seconds. No residue and no shine, just a soft finish that sits well under makeup.</p>
+    </div>
+  </section>
+
+  <section class="scene" id="line" aria-labelledby="line-title">
+    <div class="col">
+      <div class="rule" aria-hidden="true"></div>
+      <p class="eyebrow"><span class="ln"><i>The ritual</i></span></p>
+      <h2 class="display" id="line-title">
+        <span class="ln"><i>Four steps,</i></span>
+        <span class="ln"><i style="--d:.1s"><em>one flower.</em></i></span>
+      </h2>
+      <p class="body rise" style="--d:.2s">Start with the cream. Add the serum in the morning, the eye balm before bed and the oil whenever your skin feels thirsty.</p>
+      <div class="actions rise" style="--d:.3s"><a class="btn" href="#collection">Shop the collection</a></div>
+    </div>
+  </section>
+
+  <section class="collection" id="collection" aria-labelledby="collection-title" tabindex="-1">
+    <div class="chead">
+      <p class="eyebrow rise">The collection</p>
+      <h2 class="display rise" id="collection-title" style="--d:.08s">Everything we make, <em>from one peony.</em></h2>
+      <p class="body rise" style="--d:.16s">Each piece arrives in the same weighted crystal with a lacquered cap, and every one of them can be refilled.</p>
+    </div>
+
+    <ul class="grid" role="list">
+      <li class="pcard" data-sku="cream">
+        <div class="pframe"><img src="assets/img/products/cream.svg" alt="Peony Renewal Cream, a wide crystal jar with a plum lacquer cap" width="800" height="1000" loading="lazy" decoding="async"></div>
+        <div class="pinfo">
+          <h3 id="p-cream">Renewal Cream</h3>
+          <p class="pnote">Peony · Hyaluronic acid</p>
+          <p class="pprice" data-price="cream">$124</p>
+        </div>
+        <button class="add" type="button" data-add-to-bag="cream" aria-describedby="p-cream"><svg class="ic ic-bag" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg><svg class="ic ic-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></svg><span class="add-label">Add to bag</span></button>
+      </li>
+      <li class="pcard" data-sku="serum">
+        <div class="pframe"><img src="assets/img/products/serum.svg" alt="Peony Morning Serum, a tall crystal dropper bottle" width="800" height="1000" loading="lazy" decoding="async"></div>
+        <div class="pinfo">
+          <h3 id="p-serum">Morning Serum</h3>
+          <p class="pnote">Peony · Niacinamide</p>
+          <p class="pprice" data-price="serum">$92</p>
+        </div>
+        <button class="add" type="button" data-add-to-bag="serum" aria-describedby="p-serum"><svg class="ic ic-bag" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg><svg class="ic ic-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></svg><span class="add-label">Add to bag</span></button>
+      </li>
+      <li class="pcard" data-sku="eye">
+        <div class="pframe"><img src="assets/img/products/eye.svg" alt="Peony Eye Balm, a small crystal pot with a plum lacquer cap" width="800" height="1000" loading="lazy" decoding="async"></div>
+        <div class="pinfo">
+          <h3 id="p-eye">Eye Balm</h3>
+          <p class="pnote">Peony · Caffeine</p>
+          <p class="pprice" data-price="eye">$68</p>
+        </div>
+        <button class="add" type="button" data-add-to-bag="eye" aria-describedby="p-eye"><svg class="ic ic-bag" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg><svg class="ic ic-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></svg><span class="add-label">Add to bag</span></button>
+      </li>
+      <li class="pcard" data-sku="oil">
+        <div class="pframe"><img src="assets/img/products/oil.svg" alt="Peony Night Oil, a round crystal flacon of rose-pink oil" width="800" height="1000" loading="lazy" decoding="async"></div>
+        <div class="pinfo">
+          <h3 id="p-oil">Night Oil</h3>
+          <p class="pnote">Peony · Rosehip</p>
+          <p class="pprice" data-price="oil">$84</p>
+        </div>
+        <button class="add" type="button" data-add-to-bag="oil" aria-describedby="p-oil"><svg class="ic ic-bag" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5.5 8.5h13l-1.1 11.2a1.5 1.5 0 0 1-1.5 1.3H8.1a1.5 1.5 0 0 1-1.5-1.3L5.5 8.5Z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg><svg class="ic ic-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5.5 12.5 4.2 4.2 8.8-9.2"/></svg><span class="add-label">Add to bag</span></button>
+      </li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="foot" id="end">
+  <div class="foot-in">
+    <div class="fmain rise">
+      <div class="fbrand">
+        <p class="flogo">PÉTALE</p>
+        <p class="ftag">Peony skincare, poured by hand in small batches. Every jar is made to be refilled.</p>
+      </div>
+      <nav class="fcol" aria-labelledby="f-shop">
+        <h2 id="f-shop">Shop</h2>
+        <ul role="list">
+          <li><a href="#collection">Renewal Cream</a></li>
+          <li><a href="#collection">Morning Serum</a></li>
+          <li><a href="#collection">Eye Balm</a></li>
+          <li><a href="#collection">Night Oil</a></li>
+        </ul>
+      </nav>
+      <nav class="fcol" aria-labelledby="f-care">
+        <h2 id="f-care">Care</h2>
+        <ul role="list">
+          <li><a href="#">Shipping &amp; returns</a></li>
+          <li><a href="#">Refill program</a></li>
+          <li><a href="#">Questions</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="fcol">
+        <h2>Studio</h2>
+        <p>Small-batch studio</p>
+        <p>Free shipping on orders over $100</p>
+      </div>
+    </div>
+    <div class="fbar rise" style="--d:.12s">
+      <p>© 2026 Pétale</p>
+      <ul class="flegal" role="list">
+        <li><a href="#">Terms</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Accessibility</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/js/film/player.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/checkout.js" defer></script>
+</body>
+</html>

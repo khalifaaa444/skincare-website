@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- everything below resolves from the site root, exactly like index.html -->
+<base href="../">
+<title>Engine — frames harness</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --air:#F4E8EE; --ink:#24121F; --vtext:#4A2346; }
+  html, body { margin: 0; background: var(--air); color: var(--ink); font: 600 1rem/1.5 Helvetica, Arial, sans-serif; }
+  #film { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--air); }
+  main { position: relative; z-index: 2; }
+  section { position: relative; box-sizing: border-box; padding: 4.5rem; display: flex; align-items: center;
+            border-top: 2px dashed rgba(36,18,31,.25); }
+  section h2 { margin: 0; font-size: 2.2rem; background: rgba(244,232,238,.85); padding: .4rem .9rem; border-radius: 12px; }
+  section::after { content: attr(data-mid); position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid #c0306a;
+                   font-size: .875rem; color: #c0306a; padding: .2rem 4.5rem; }
+  #top { height: 100vh; } #bloom { height: 140vh; } #cream { height: 160vh; } #texture { height: 120vh; } #line { height: 130vh; }
+  #after { height: 150vh; } footer { height: 60vh; position: relative; z-index: 2; background: #fff; }
+  #hud { position: fixed; right: 12px; bottom: 12px; z-index: 99; font: 0.875rem/1.45 ui-monospace, Menlo, monospace;
+         background: rgba(20,8,18,.82); color: #f7e9f0; padding: 10px 14px; border-radius: 10px; white-space: pre;
+         pointer-events: none; }
+  #veil { position: fixed; inset: 0; z-index: 60; background: var(--air); display: grid; place-items: center; transition: opacity .6s; }
+  #veil.gone { opacity: 0; pointer-events: none; }
+  #bar { width: 220px; height: 3px; background: rgba(36,18,31,.12); }
+  #bar i { display: block; height: 100%; width: 0; background: #7A4B78; }
+  @media (max-aspect-ratio: 85/100) {
+    section { align-items: flex-start; padding: 5rem 1.25rem; }
+    section h2 { font-size: 1.6rem; }
+    #hud { left: 8px; right: 8px; bottom: 8px; white-space: pre-wrap; }
+  }
+</style>
+</head>
+<body>
+<div id="film"></div>
+<div id="veil"><div><div id="bar"><i></i></div></div></div>
+<main>
+  <section id="top" data-mid="#top centre → p 0"><h2>#top</h2></section>
+  <section id="bloom" data-mid="#bloom centre → p .25"><h2>#bloom</h2></section>
+  <section id="cream" data-mid="#cream centre → p .5"><h2>#cream</h2></section>
+  <section id="texture" data-mid="#texture centre → p .75"><h2>#texture</h2></section>
+  <section id="line" data-mid="#line centre → p 1"><h2>#line</h2></section>
+  <section id="after"><h2>after the film</h2></section>
+</main>
+<footer></footer>
+<div id="hud">…</div>
+
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="assets/js/film/player.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var useLenis = q.get('lenis') !== '0' && window.Lenis;
+  var config = {
+    source: q.get('source') || 'frames',
+    manifest: q.get('manifest') || 'film/manifest.json',
+    scene: q.get('scene') || 'scene2d'
+  };
+  var bar = document.querySelector('#bar i'), veil = document.getElementById('veil');
+  var log = window.__log = { progress: [], ready: 0 };
+  var player = FilmPlayer.create({
+    container: document.getElementById('film'),
+    anchors: ['top', 'bloom', 'cream', 'texture', 'line'],
+    config: config,
+    onLoadProgress: function (f) { log.progress.push(+f.toFixed(3)); bar.style.width = (f * 100) + '%'; },
+    onReady: function () { log.ready++; veil.classList.add('gone'); }
+  });
+  var lenis = useLenis ? new Lenis({ lerp: 0.12, smoothWheel: true }) : null;
+  window.lenis = lenis;
+  window.__harness = { player: player, lenis: lenis };
+
+  var hud = document.getElementById('hud'), hudT = 0;
+  function loop(t) {
+    if (lenis) lenis.raf(t);
+    player.frame(t, lenis ? lenis.scroll : window.scrollY);
+    if (t - hudT > 100) {
+      hudT = t;
+      var d = window.__film.debug() || {};
+      hud.textContent =
+        'source   ' + (window.__film.source || '…') + (d.variant ? ' / ' + d.variant + ' (' + d.count + ')' : '') + '\n' +
+        'progress ' + player.progress.toFixed(4) + '  target ' + player.target.toFixed(4) + '\n' +
+        'frame    ' + d.frame + '  drawn ' + d.drawn + ' [' + d.tier + ']' + (d.exact ? '  exact' : '') + '\n' +
+        'moving   ' + !!d.moving + '\n' +
+        'bytes    ' + d.loaded + '/' + d.count + '  ' + d.mb + ' MB\n' +
+        'window   ' + d.window + '/' + d.windowCap + '  ' + d.windowMB + ' MB  grid ' + d.grid + ' (1/' + d.gridEvery + ')\n' +
+        'decode   ' + d.decodeMs + ' ms  latency ' + d.latencyMs + ' ms  workers ' + d.workers + '\n' +
+        'render   ' + (d.stats ? d.stats.renderMs.toFixed(2) : '–') + ' ms avg' + (d.lite ? '  (light set while moving)' : '') + '\n' +
+        'canvas   ' + (d.canvas || []).join('×') + '  decode ' + (d.decodeSize || []).join('×');
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

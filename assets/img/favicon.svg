@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Pétale</title>
+  <!-- a peony seen from above: five outer petals, five inner, a closed heart -->
+  <defs>
+    <path id="o" d="M32 31.5C23.6 27.2 20.2 17.6 25 9.6c2.4-4 5.3-5.6 7-5.6s4.6 1.6 7 5.6c4.8 8 1.4 17.6-7 21.9Z"/>
+    <path id="n" d="M32 31c-4.6-2.6-6.3-7.8-3.7-12.2C29.6 16.6 31 16 32 16s2.4.6 3.7 2.8c2.6 4.4.9 9.6-3.7 12.2Z"/>
+  </defs>
+  <g fill="#7A4B78">
+    <use href="#o"/>
+    <use href="#o" transform="rotate(72 32 32)"/>
+    <use href="#o" transform="rotate(144 32 32)"/>
+    <use href="#o" transform="rotate(216 32 32)"/>
+    <use href="#o" transform="rotate(288 32 32)"/>
+  </g>
+  <g fill="#C49BC1">
+    <use href="#n" transform="rotate(36 32 32)"/>
+    <use href="#n" transform="rotate(108 32 32)"/>
+    <use href="#n" transform="rotate(180 32 32)"/>
+    <use href="#n" transform="rotate(252 32 32)"/>
+    <use href="#n" transform="rotate(324 32 32)"/>
+  </g>
+  <circle cx="32" cy="32" r="4.2" fill="#7A4B78"/>
+</svg>
